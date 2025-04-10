@@ -10,7 +10,7 @@ from django.core.files.storage import FileSystemStorage
 import os
 import base64
 
-cred = credentials.Certificate("importan_files\chatappinflet-firebase-adminsdk-fbsvc-21c202103a.json")
+cred = credentials.Certificate("\importan_files\chatappinflet-firebase-adminsdk-fbsvc-21c202103a.json")
 firebase_admin.initialize_app(cred)
 
 from decouple import config
