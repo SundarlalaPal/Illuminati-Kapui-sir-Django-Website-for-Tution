@@ -3,15 +3,11 @@ from django.http import JsonResponse, HttpResponse
 import pyrebase
 import json
 import utils_my_personal
-import firebase_admin
-from firebase_admin import credentials
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import os
 import base64
 
-cred = credentials.Certificate("\importan_files\chatappinflet-firebase-adminsdk-fbsvc-21c202103a.json")
-firebase_admin.initialize_app(cred)
 
 from decouple import config
 firebaseConfig = json.loads(config("FIREBASE_CONFIG"))
