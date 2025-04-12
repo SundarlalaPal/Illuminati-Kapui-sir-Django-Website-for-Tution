@@ -23,7 +23,7 @@ def signup(request):
 
 def login(request):
     if request.method == "GET":
-        return render(request, "/authentication/login.html")
+        return render(request, "authentication/login.html")
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -32,7 +32,7 @@ def login(request):
             request.session["id_token"] = login_user_id
             return redirect("/dashboard")
         else:
-            return render(request, "/authentication/login.html", {"error": "Invalid credentials"})
+            return render(request, "authentication/login.html", {"error": "Invalid credentials"})
 
 
 
