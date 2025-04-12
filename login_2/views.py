@@ -15,7 +15,7 @@ def dashboard(request):
          "Last_Name": user_data.get('Last Name'),
          "email": user_data.get('email')
     }
-    return render(request, "dashboard.html", context)
+    return render(request, "/dashboard.html", context)
 
 def coming_soon(request):
-    return render(request,"coming_soon.html") 
+    return render(request,"/coming_soon.html") 
