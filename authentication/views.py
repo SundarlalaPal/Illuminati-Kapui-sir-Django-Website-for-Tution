@@ -15,15 +15,15 @@ def signup(request):
         board = request.POST.get("board")
         id_token = utils_my_personal.Firebase_Operations().create_user_tem(firstname=first_name,lastname=last_name,email=email, password=password,age=age,guardianname=guardianname,phone=phonenumber,classs = classs, board=board)
         if id_token==False:
-            return render(request, "authentication\signup.html", {"error": "User already exists"})
+            return render(request, "/authentication/signup.html", {"error": "User already exists"})
         else:
-            return render(request, "authentication\signedup.html")
+            return render(request, "/authentication/signedup.html")
     if request.method == "GET":
-        return render(request, "authentication\signup.html")
+        return render(request, "/authentication/signup.html")
 
 def login(request):
     if request.method == "GET":
-        return render(request, "authentication\login.html")
+        return render(request, "/authentication/login.html")
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -32,7 +32,7 @@ def login(request):
             request.session["id_token"] = login_user_id
             return redirect("/dashboard")
         else:
-            return render(request, "authentication\login.html", {"error": "Invalid credentials"})
+            return render(request, "/authentication/login.html", {"error": "Invalid credentials"})
 
 
 
