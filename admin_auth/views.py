@@ -30,7 +30,7 @@ def chech_auth_admin(email,passw):
 def login(request):
     if request.method == "GET":
         if "name" not in request.session:
-            return render(request, "/admin_auth/login.html")
+            return render(request, "admin_auth/login.html")
         return redirect("/admin-auth/dashboard")
     if request.method == "POST":
         email = request.POST.get("email")
@@ -40,7 +40,7 @@ def login(request):
             request.session["name"] = login_user_id
             return redirect("/admin-auth/dashboard")
         else:
-            return render(request, "/admin_auth/login.html", {"error": "Invalid credentials"})
+            return render(request, "admin_auth/login.html", {"error": "Invalid credentials"})
 
 def dashboard(request):
     if "name" not in request.session:
@@ -50,7 +50,7 @@ def dashboard(request):
         "First_Name": user_data.get('First Name'),
          "email": user_data.get('email')
     }
-    return render(request, "/admin_auth/dashboard.html", context)
+    return render(request, "admin_auth/dashboard.html", context)
 
 def signup_user(request):
     if request.method == "GET":
@@ -61,7 +61,7 @@ def signup_user(request):
                 # if pd.val().get("show") == True:
                 users.append({"user_id":sg_u.val().get("user_id"),"First_Name": sg_u.val().get("First Name"),"Last_Name": sg_u.val().get("Last Name"),"email": sg_u.val().get("email"),"Password": sg_u.val().get("Password"),"Phone_Number":sg_u.val().get("Phone Number"),"Age":sg_u.val().get("Age"),"Class":sg_u.val().get("Class"),"Guardian_Name":sg_u.val().get("Guardian Name"),"Board":sg_u.val().get("Board")})
         # print(users)
-        return render(request,"/admin_auth/list_signup.html",{"users":users})
+        return render(request,"admin_auth/list_signup.html",{"users":users})
     
     if request.method == "POST":
         try:
@@ -108,7 +108,7 @@ def list_pdfs(request):
                         pdfs_val_true.append({"Class":i,"name":pd.val().get("name")})
                     else:
                         pdfs_val_false.append({"Class":i,"name":pd.val().get("name")})
-        return render(request, "/admin_auth/list_pdfs.html",{"t_pdfs":pdfs_val_true,"f_pdfs":pdfs_val_false})
+        return render(request, "admin_auth/list_pdfs.html",{"t_pdfs":pdfs_val_true,"f_pdfs":pdfs_val_false})
     
     if request.method == "POST":
         data = json.loads(request.body)
@@ -136,12 +136,12 @@ def upload_pdf(request):
 
         # Check if both file and class are provided
         if not pdf_file or not selected_class:
-            return render(request, '/admin_auth/upload.html', {'message': 'Please select a class and upload a file.'})
+            return render(request, 'admin_auth/upload.html', {'message': 'Please select a class and upload a file.'})
 
         # Validate that the selected class is valid (between 5 and 12)
         valid_classes = [str(i) for i in range(5, 13)]
         if selected_class not in valid_classes:
-            return render(request, '/admin_auth/upload.html', {'message': 'Invalid class selected.'})
+            return render(request, 'admin_auth/upload.html', {'message': 'Invalid class selected.'})
 
         # Build the folder path: media/uploaded_pdf/class_X/
         upload_dir = os.path.join(settings.MEDIA_ROOT, 'uploaded_pdf', f'class_{selected_class}')
@@ -164,7 +164,7 @@ def upload_pdf(request):
         os.remove(file_path)
 
 
-        return render(request, "/admin_auth/upload.html", {'message': f'Upload successful for Class {selected_class}!'})
+        return render(request, "admin_auth/upload.html", {'message': f'Upload successful for Class {selected_class}!'})
 
     # For GET requests, simply show the upload form
-    return render(request, "/admin_auth/upload.html")  
+    return render(request, "admin_auth/upload.html")  
