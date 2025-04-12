@@ -35,7 +35,7 @@ def pdf_viewer(request):
         base64_pdf = base64.b64encode(pdf_data).decode('utf-8')
         
         context = {'pdf_content': base64_pdf}
-        return render(request, '/students/pdf.html', context)
+        return render(request, 'students/pdf.html', context)
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -61,7 +61,7 @@ def avail_pdf(request):
                 if pd.val().get("show") == True or pd.val().get("show") == "True":
                     pdfs.append({"name":pd.val().get("name")})
         
-        return render(request, "/students/me_select.html",{"pdfs":pdfs})
+        return render(request, "students/me_select.html",{"pdfs":pdfs})
     
     if request.method == "POST":
         data = json.loads(request.body)
