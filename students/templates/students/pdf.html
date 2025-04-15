@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <title>PDF Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=no">
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden;
       font-family: sans-serif;
+      overflow: hidden;
     }
 
     #toolbar {
@@ -20,29 +20,30 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     #toolbar button {
-      margin: 0 5px;
+      margin: 5px;
       padding: 8px 12px;
       background: #555;
       border: none;
-      color: #fff;
-      cursor: pointer;
       border-radius: 4px;
+      color: white;
+      cursor: pointer;
     }
 
     #viewerContainer {
-      position: relative;
-      height: calc(100vh - 50px);
+      height: calc(100vh - 60px);
       overflow: auto;
       background: #ccc;
       -webkit-overflow-scrolling: touch;
+      position: relative;
     }
 
     #pdfPagesWrapper {
-      position: relative;
       transform-origin: top left;
+      transition: transform 0.05s ease;
     }
 
     .pdf-page {
@@ -85,7 +86,7 @@
       pdfPagesWrapper.innerHTML = '';
       for (let i = 1; i <= pdf.numPages; i++) {
         pdf.getPage(i).then(page => {
-          const viewport = page.getViewport({ scale: scale, rotation });
+          const viewport = page.getViewport({ scale, rotation });
           const canvas = document.createElement("canvas");
           canvas.classList.add("pdf-page");
           canvas.width = viewport.width;
@@ -104,7 +105,7 @@
     }
 
     function zoomIn() {
-      scale = Math.min(scale + 0.25, 4);
+      scale = Math.min(scale + 0.25, 5);
       renderAllPages(pdfDoc);
     }
 
@@ -131,15 +132,15 @@
       renderAllPages(pdf);
     });
 
-    // Touch pinch-to-zoom
+    // Pinch-to-zoom logic
     let startDistance = null;
     let startScale = 1;
     let originX = 0;
     let originY = 0;
+    let pinchTimeout;
 
     viewerContainer.addEventListener("touchstart", function (e) {
       if (e.touches.length === 2) {
-        e.preventDefault();
         const dx = e.touches[1].clientX - e.touches[0].clientX;
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         startDistance = Math.hypot(dx, dy);
@@ -163,8 +164,15 @@
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         const currentDistance = Math.hypot(dx, dy);
         const scaleFactor = currentDistance / startDistance;
-        scale = Math.min(Math.max(startScale * scaleFactor, 0.5), 4);
-        renderAllPages(pdfDoc);
+        scale = Math.min(Math.max(startScale * scaleFactor, 0.5), 5);
+
+        pdfPagesWrapper.style.transform = `scale(${scale})`;
+
+        clearTimeout(pinchTimeout);
+        pinchTimeout = setTimeout(() => {
+          pdfPagesWrapper.style.transform = 'none';
+          renderAllPages(pdfDoc);
+        }, 250);
       }
     });
 
