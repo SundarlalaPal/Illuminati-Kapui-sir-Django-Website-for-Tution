@@ -1,11 +1,23 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Advanced PDF Viewer</title>
-  <!-- Allow native pinch zooming -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes" />
+  <meta name="description" content="Advanced PDF Viewer - Illuminati Coaching Centre. View PDFs with ease and interact with our high-tech viewer.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=no" />
+  <meta property="og:title" content="Advanced PDF Viewer">
+  <meta property="og:image" content="{% static 'images/favicon.png' %}">
+  <meta property="og:description" content="View advanced PDFs at Illuminati Coaching Centre">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <title>Advanced PDF Viewer | Illuminati Coaching Centre</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  
   <style>
+    /* PDF Viewer Custom Styles */
     html, body {
       margin: 0;
       padding: 0;
@@ -31,14 +43,12 @@
       color: white;
       cursor: pointer;
     }
-    /* Enable smooth scrolling and proper gesture handling */
     #viewerContainer {
       height: calc(100vh - 60px);
       overflow: auto;
       background: #ccc;
       -webkit-overflow-scrolling: touch;
       position: relative;
-      touch-action: pan-x pan-y;
     }
     #pdfPagesWrapper {
       position: relative;
@@ -59,31 +69,80 @@
     }
   </style>
 </head>
-<body>
-  <div id="toolbar">
-    <button onclick="zoomIn()">Zoom In</button>
-    <button onclick="zoomOut()">Zoom Out</button>
-    <button onclick="rotate()">Rotate</button>
-    <button onclick="toggleFullscreen()">Fullscreen</button>
-  </div>
-  <div id="viewerContainer">
-    <div id="pdfPagesWrapper"></div>
-  </div>
+<body class="bg-gray-100 text-gray-800">
+  <!-- Navbar -->
+  <nav class="bg-blue-800 border-gray-200">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{% static 'images/logo2.png' %}" alt="Illuminati Logo" class="h-8" />
+        <span class="self-center text-2xl font-semibold text-white">Illuminati</span>
+      </a>
+      <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-5 h-5" aria-hidden="true" fill="none" viewBox="0 0 17 14" xmlns="http://www.w3.org/2000/svg">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
+        </svg>
+      </button>
+      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+        <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-blue-700 rounded-lg bg-blue-700 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-blue-800">
+          <li><a href="/" class="block py-2 px-3 text-white md:hover:text-yellow-300">Home</a></li>
+          <li><a href="#contact" class="block py-2 px-3 text-white md:hover:text-yellow-300">Contact</a></li>
+          <li><a href="/dashboard" class="block py-2 px-3 text-white md:hover:text-yellow-300">Dashboard</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PDF Viewer Section -->
+  <main class="flex flex-col h-full">
+    <div id="toolbar"></div>
+    <div id="viewerContainer"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white text-center py-10">
+    <div class="max-w-4xl mx-auto px-4">
+      <h3 class="text-2xl font-extrabold text-yellow-400">Crafted with Passion</h3>
+      <p class="mt-4 text-xl">This entire website — from concept to code — has been envisioned, designed, and developed by</p>
+      <p class="mt-2 text-3xl font-bold text-white">Sundarlala Pal</p>
+      <p class="text-base italic text-gray-300">(Frontend Ninja, Backend Beast, Full Stack Wizard & Future Iron Man 🦾)</p>
+      <div class="mt-6">
+        <p class="text-lg">Want a custom website, app, or digital solution for your business or idea?</p>
+        <p class="text-lg font-semibold mt-1">I build everything from scratch, tailored to your vision!</p>
+      </div>
+      <p class="mt-4 text-lg">Reach out to me directly:</p>
+      <p class="mt-2">
+        <a href="https://wa.me/919933882270" class="text-green-400 hover:underline">WhatsApp</a>
+      </p>
+      <p class="mt-6 text-sm text-gray-400">&copy; 2025 Illuminati Coaching Centre. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- PDF.js Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.min.js"></script>
   <script>
     const base64PDF = `{{ pdf_content|safe }}`;
     const pdfData = atob(base64PDF);
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.worker.min.js';
-    
+
+    const toolbar = document.getElementById("toolbar");
+    toolbar.innerHTML = `
+      <button onclick="zoomIn()">Zoom In</button>
+      <button onclick="zoomOut()">Zoom Out</button>
+      <button onclick="rotate()">Rotate</button>
+      <button onclick="toggleFullscreen()">Fullscreen</button>
+    `;
+
     const viewerContainer = document.getElementById("viewerContainer");
-    const pdfPagesWrapper = document.getElementById("pdfPagesWrapper");
+    const pdfPagesWrapper = document.createElement("div");
+    pdfPagesWrapper.id = "pdfPagesWrapper";
+    viewerContainer.appendChild(pdfPagesWrapper);
 
     let scale = 1;
     let rotation = 0;
     let pdfDoc = null;
     let pageCanvases = {};
-    let prevScale = scale;
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -120,10 +179,7 @@
         canvas.width = viewport.width;
         canvas.height = viewport.height;
         const context = canvas.getContext('2d');
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        };
+        const renderContext = { canvasContext: context, viewport: viewport };
         page.render(renderContext).promise.then(() => {
           const placeholder = document.querySelector(`.page-placeholder[data-page-number='${pageNum}']`);
           if (placeholder) {
@@ -134,7 +190,6 @@
       });
     }
 
-    // Preserves the scroll position based on the focal point
     function rerenderAllPreserveScroll(focusX = 0.5, focusY = 0.5) {
       const scrollX = viewerContainer.scrollLeft;
       const scrollY = viewerContainer.scrollTop;
@@ -142,29 +197,17 @@
       const targetX = scrollX + rect.width * focusX;
       const targetY = scrollY + rect.height * focusY;
       setupLazyLoading();
-      const newScrollX = targetX * (scale / prevScale) - rect.width * focusX;
-      const newScrollY = targetY * (scale / prevScale) - rect.height * focusY;
-      viewerContainer.scrollLeft = newScrollX;
-      viewerContainer.scrollTop = newScrollY;
+      setTimeout(() => {
+        const newScrollX = targetX * (scale / prevScale) - rect.width * focusX;
+        const newScrollY = targetY * (scale / prevScale) - rect.height * focusY;
+        viewerContainer.scrollLeft = newScrollX;
+        viewerContainer.scrollTop = newScrollY;
+      }, 100);
     }
 
-    function zoomIn() {
-      prevScale = scale;
-      scale = Math.min(scale + 0.25, 5);
-      rerenderAllPreserveScroll();
-    }
-
-    function zoomOut() {
-      prevScale = scale;
-      scale = Math.max(scale - 0.25, 0.5);
-      rerenderAllPreserveScroll();
-    }
-
-    function rotate() {
-      rotation = (rotation + 90) % 360;
-      setupLazyLoading();
-    }
-
+    function zoomIn() { prevScale = scale; scale = Math.min(scale + 0.25, 5); rerenderAllPreserveScroll(); }
+    function zoomOut() { prevScale = scale; scale = Math.max(scale - 0.25, 0.5); rerenderAllPreserveScroll(); }
+    function rotate() { rotation = (rotation + 90) % 360; setupLazyLoading(); }
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
         viewerContainer.requestFullscreen().catch(console.error);
@@ -173,63 +216,46 @@
       }
     }
 
+    let prevScale = scale;
     pdfjsLib.getDocument({ data: new Uint8Array([...pdfData].map(c => c.charCodeAt(0))) }).promise.then(pdf => {
       pdfDoc = pdf;
       setupLazyLoading();
     });
 
-    // Handle pinch-to-zoom gestures
-    let startDistance = null;
-    let startScale = 1;
-    let pinchScaleFactor = 1;
-    // originX and originY are stored as fractions (0-1) of pdfPagesWrapper dimensions.
-    let originX = 0.5, originY = 0.5;
-
+    // Touch zoom support
+    let startDistance = null, startScale = 1, originX = 0.5, originY = 0.5, pinchTimeout;
     viewerContainer.addEventListener("touchstart", (e) => {
       if (e.touches.length === 2) {
-        // Compute the initial distance between two fingers.
         const dx = e.touches[1].clientX - e.touches[0].clientX;
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         startDistance = Math.hypot(dx, dy);
         startScale = scale;
-        // Calculate the focal point of the gesture.
         const rect = viewerContainer.getBoundingClientRect();
-        const midX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left + viewerContainer.scrollLeft;
-        const midY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top + viewerContainer.scrollTop;
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left + viewerContainer.scrollLeft;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top + viewerContainer.scrollTop;
         originX = midX / pdfPagesWrapper.scrollWidth;
         originY = midY / pdfPagesWrapper.scrollHeight;
         pdfPagesWrapper.style.transformOrigin = `${originX * 100}% ${originY * 100}%`;
       }
     });
-
     viewerContainer.addEventListener("touchmove", (e) => {
       if (e.touches.length === 2 && startDistance !== null) {
-        // Prevent the default pinch-to-zoom behavior.
         e.preventDefault();
         const dx = e.touches[1].clientX - e.touches[0].clientX;
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         const currentDistance = Math.hypot(dx, dy);
-        // Capture the instantaneous pinch scale factor.
-        pinchScaleFactor = currentDistance / startDistance;
-        // Apply a temporary CSS transform for smooth visual feedback.
-        pdfPagesWrapper.style.transform = `scale(${startScale * pinchScaleFactor})`;
+        const scaleFactor = currentDistance / startDistance;
+        pdfPagesWrapper.style.transform = `scale(${startScale * scaleFactor})`;
+        clearTimeout(pinchTimeout);
+        pinchTimeout = setTimeout(() => {
+          prevScale = scale;
+          scale = Math.min(Math.max(startScale * scaleFactor, 0.5), 5);
+          pdfPagesWrapper.style.transform = 'none';
+          rerenderAllPreserveScroll(originX, originY);
+        }, 200);
       }
     });
-
-    viewerContainer.addEventListener("touchend", (e) => {
-      if (startDistance !== null) {
-        // When touch ends, remove the temporary transform.
-        pdfPagesWrapper.style.transform = 'none';
-        prevScale = scale;
-        // Update scale based on the final pinch factor.
-        scale = Math.min(Math.max(startScale * pinchScaleFactor, 0.5), 5);
-        // Re-render the PDF pages with the new scale while preserving the zoom focal point.
-        rerenderAllPreserveScroll(originX, originY);
-        // Reset the pinch values.
-        startDistance = null;
-        pinchScaleFactor = 1;
-      }
-    });
+    viewerContainer.addEventListener("touchend", () => { startDistance = null; });
   </script>
 </body>
 </html>
