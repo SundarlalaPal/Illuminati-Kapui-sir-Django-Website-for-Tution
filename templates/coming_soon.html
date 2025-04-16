@@ -2,16 +2,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Illuminati">
-<meta property="og:image" content="{% static 'images/favicon.png' %}">
-<meta property="og:description" content="Study">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta property="og:title" content="Illuminati" />
+  <meta property="og:image" content="{% static 'images/favicon.png' %}" />
+  <meta property="og:description" content="Study" />
 
-    <title>Document</title>
-    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <title>Coming Soon - Illuminati Coaching Centre</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .atom-float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes glowText {
+      0%, 100% { text-shadow: 0 0 10px #facc15; }
+      50% { text-shadow: 0 0 20px #facc15, 0 0 40px #facc15; }
+    }
+
+    .glow-text {
+      animation: glowText 2s ease-in-out infinite;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .bg-animate {
+      background: linear-gradient(135deg, #1e3c72, #2a5298, #6dd5ed, #2193b0, #6a11cb, #2575fc);
+      background-size: 400% 400%;
+      animation: gradientMove 12s ease infinite;
+    }
+  </style>
 </head>
-<body>
-    coming soon
+<body class="bg-animate text-white min-h-screen flex flex-col justify-between">
+
+  <!-- Hero Section -->
+  <section class="flex flex-col items-center justify-center text-center px-6 py-24">
+    <img src="https://img.icons8.com/ios-filled/100/ffffff/atom-editor.png" class="w-20 h-20 atom-float mb-6" alt="Atom Logo" />
+    <h1 class="text-5xl md:text-6xl font-bold glow-text">We're Launching Soon!</h1>
+    <p class="text-lg mt-4 max-w-2xl">The future of science learning is almost here. Our platform is under construction and will be live very shortly. Stay tuned, young scientists!</p>
+
+    <div class="mt-10">
+      <a href="/" class="inline-block bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-full font-bold transition duration-300 shadow-lg">Back to Home</a>
+    </div>
+  </section>
+
+  <!-- Footer (from index.html) -->
+  <footer class="bg-gray-900 text-white text-center py-10">
+    <div class="max-w-4xl mx-auto px-4">
+      <h3 class="text-2xl font-extrabold text-yellow-400">Crafted with Passion</h3>
+      <p class="mt-4 text-xl">This entire website — from concept to code — has been envisioned, designed, and developed by</p>
+      <p class="mt-2 text-3xl font-bold text-white">Sundarlala Pal</p>
+      <p class="text-base italic text-gray-300">(Frontend Ninja, Backend Beast, Full Stack Wizard & Future Iron Man 🦾)</p>
+      <div class="mt-6">
+        <p class="text-lg">Want a custom website, app, or digital solution for your business or idea?</p>
+        <p class="text-lg font-semibold mt-1">I build everything from scratch, tailored to your vision!</p>
+      </div>
+      <p class="mt-4 text-lg">Reach out to me directly:</p>
+      <p class="mt-2">
+        <a href="https://wa.me/918001647007" class="text-green-400 hover:underline">WhatsApp</a>
+      </p>
+      <p class="mt-6 text-sm text-gray-400">&copy; 2025 Illuminati Coaching Centre. All Rights Reserved.</p>
+    </div>
+  </footer>
+
 </body>
 </html>
