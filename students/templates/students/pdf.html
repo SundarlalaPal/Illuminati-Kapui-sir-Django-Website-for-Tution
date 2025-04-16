@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Advanced PDF Viewer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=no" />
+  <!-- Allow native pinch zooming -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes" />
   <style>
     html, body {
       margin: 0;
@@ -12,7 +13,6 @@
       font-family: sans-serif;
       overflow: hidden;
     }
-
     #toolbar {
       background: #333;
       color: white;
@@ -22,7 +22,6 @@
       align-items: center;
       flex-wrap: wrap;
     }
-
     #toolbar button {
       margin: 5px;
       padding: 8px 12px;
@@ -32,20 +31,19 @@
       color: white;
       cursor: pointer;
     }
-
+    /* Enable smooth scrolling and proper gesture handling */
     #viewerContainer {
       height: calc(100vh - 60px);
       overflow: auto;
       background: #ccc;
       -webkit-overflow-scrolling: touch;
       position: relative;
+      touch-action: pan-x pan-y;
     }
-
     #pdfPagesWrapper {
       position: relative;
       transform-origin: top left;
     }
-
     .pdf-page {
       display: block;
       margin: 10px auto;
@@ -53,7 +51,6 @@
       background: #fff;
       border-radius: 4px;
     }
-
     .page-placeholder {
       min-height: 1000px;
       margin: 10px auto;
@@ -63,25 +60,22 @@
   </style>
 </head>
 <body>
-
   <div id="toolbar">
     <button onclick="zoomIn()">Zoom In</button>
     <button onclick="zoomOut()">Zoom Out</button>
     <button onclick="rotate()">Rotate</button>
     <button onclick="toggleFullscreen()">Fullscreen</button>
   </div>
-
   <div id="viewerContainer">
     <div id="pdfPagesWrapper"></div>
   </div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.min.js"></script>
   <script>
     const base64PDF = `{{ pdf_content|safe }}`;
     const pdfData = atob(base64PDF);
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.10.111/pdf.worker.min.js';
-
+    
     const viewerContainer = document.getElementById("viewerContainer");
     const pdfPagesWrapper = document.getElementById("pdfPagesWrapper");
 
@@ -89,6 +83,7 @@
     let rotation = 0;
     let pdfDoc = null;
     let pageCanvases = {};
+    let prevScale = scale;
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -118,7 +113,6 @@
 
     function renderPage(pageNum) {
       if (pageCanvases[pageNum]) return;
-
       pdfDoc.getPage(pageNum).then(page => {
         const viewport = page.getViewport({ scale, rotation });
         const canvas = document.createElement("canvas");
@@ -131,7 +125,6 @@
           canvasContext: context,
           viewport: viewport
         };
-
         page.render(renderContext).promise.then(() => {
           const placeholder = document.querySelector(`.page-placeholder[data-page-number='${pageNum}']`);
           if (placeholder) {
@@ -142,16 +135,16 @@
       });
     }
 
+    // Preserves scroll position after zooming or rotating
     function rerenderAllPreserveScroll(focusX = 0.5, focusY = 0.5) {
       const scrollX = viewerContainer.scrollLeft;
       const scrollY = viewerContainer.scrollTop;
       const rect = viewerContainer.getBoundingClientRect();
-
       const targetX = scrollX + rect.width * focusX;
       const targetY = scrollY + rect.height * focusY;
 
       setupLazyLoading();
-
+      
       setTimeout(() => {
         const newScrollX = targetX * (scale / prevScale) - rect.width * focusX;
         const newScrollY = targetY * (scale / prevScale) - rect.height * focusY;
@@ -185,14 +178,12 @@
       }
     }
 
-    let prevScale = scale;
-
     pdfjsLib.getDocument({ data: new Uint8Array([...pdfData].map(c => c.charCodeAt(0))) }).promise.then(pdf => {
       pdfDoc = pdf;
       setupLazyLoading();
     });
 
-    // Touch zoom
+    // Handle pinch-to-zoom gestures
     let startDistance = null;
     let startScale = 1;
     let originX = 0.5, originY = 0.5;
@@ -204,26 +195,25 @@
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         startDistance = Math.hypot(dx, dy);
         startScale = scale;
-
         const rect = viewerContainer.getBoundingClientRect();
-        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left + viewerContainer.scrollLeft;
-        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top + viewerContainer.scrollTop;
+        const midX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left + viewerContainer.scrollLeft;
+        const midY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top + viewerContainer.scrollTop;
         originX = midX / pdfPagesWrapper.scrollWidth;
         originY = midY / pdfPagesWrapper.scrollHeight;
-
         pdfPagesWrapper.style.transformOrigin = `${originX * 100}% ${originY * 100}%`;
       }
     });
 
     viewerContainer.addEventListener("touchmove", (e) => {
       if (e.touches.length === 2 && startDistance !== null) {
+        // Only prevent default during pinch gestures
         e.preventDefault();
         const dx = e.touches[1].clientX - e.touches[0].clientX;
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         const currentDistance = Math.hypot(dx, dy);
         const scaleFactor = currentDistance / startDistance;
+        // Temporarily scale the content for a smooth pinch effect
         pdfPagesWrapper.style.transform = `scale(${startScale * scaleFactor})`;
-
         clearTimeout(pinchTimeout);
         pinchTimeout = setTimeout(() => {
           prevScale = scale;
