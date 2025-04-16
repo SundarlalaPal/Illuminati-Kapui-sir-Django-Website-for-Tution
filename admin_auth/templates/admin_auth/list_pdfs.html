@@ -2,108 +2,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Illuminati">
-<meta property="og:image" content="{% static 'images/favicon.png' %}">
-<meta property="og:description" content="Study">
-    <title>PDFS</title>
-    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
-    <script>
-        function sendpdfData(allow,namee,classssss) {
-            const data = {
-                "open_ok": allow,
-                "name__": namee,
-                "class": classssss,
-            };
-
-            fetch(window.location.href, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": document.getElementById("csrf_token").value
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;  // This will follow the redirect
-                    } else {
-                        // Optional fallback: handle other cases
-                        return response.json();
-                    }
-                })
-                .then(data => {
-                    if (data && data.message) {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => console.error("Error:", error));
-        }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="description" content="Admin view for managing PDFs on Illuminati Coaching Centre website. Approve, deny, or delete PDF files easily.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Manage PDFs | Illuminati Coaching Centre">
+  <meta property="og:image" content="{% static 'images/favicon.png' %}">
+  <meta property="og:description" content="Admin panel to manage and control PDF display">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <title>Manage PDFs | Illuminati Coaching Centre</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
 </head>
-<body>
-    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+<body class="bg-gray-100 text-gray-800">
+  <!-- Navbar -->
+  <nav class="bg-blue-800 border-gray-200">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{% static 'images/logo2.png' %}" class="h-8" alt="Illuminati Logo" />
+        <span class="self-center text-2xl font-semibold text-white">Illuminati</span>
+      </a>
+      <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-5 h-5" aria-hidden="true" fill="none" viewBox="0 0 17 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
+        </svg>
+      </button>
+      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+        <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-blue-700 rounded-lg bg-blue-700 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-blue-800">
+          <li><a href="/" class="block py-2 px-3 text-white md:hover:text-yellow-300">Home</a></li>
+          <li><a href="/dashboard" class="block py-2 px-3 text-white md:hover:text-yellow-300">Dashboard</a></li>
+          <li><a href="/auth/logout" class="block py-2 px-3 text-white md:hover:text-yellow-300">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-    <h1>PDFs that are visible now</h1>
-    <table border="1">
-        <thead>
+  <!-- Admin PDF Management Section -->
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-blue-800 mb-6">Manage PDFs</h1>
+    
+    <section class="mb-12">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">PDFs That Are Visible</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg">
+          <thead class="bg-blue-800 text-white">
             <tr>
-                <th>PDF Names</th>
-                <th>Class</th>
-                <th>Actions</th>
+              <th class="py-2 px-4">PDF Names</th>
+              <th class="py-2 px-4">Class</th>
+              <th class="py-2 px-4">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody class="text-gray-700">
             {% for pdf in t_pdfs %}
-            <tr>
-                <td>{{ pdf.name }}</td>
-                <td>{{ pdf.Class }}</td>
-                <td>
-                    <button onclick="sendpdfData('False','{{ pdf.name|escapejs }}','{{ pdf.Class|escapejs }}')">Deny</button>
-                    <button onclick="sendpdfData('delete','{{ pdf.name|escapejs }}','{{ pdf.Class|escapejs }}')">Delete</button>
-                </td>
+            <tr class="border-b hover:bg-gray-100">
+              <td class="py-2 px-4">{{ pdf.name }}</td>
+              <td class="py-2 px-4">{{ pdf.Class }}</td>
+              <td class="py-2 px-4 space-x-2">
+                <button onclick="sendpdfData('False','{{ pdf.name|escapejs }}','{{ pdf.Class|escapejs }}')" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">Deny</button>
+                <button onclick="sendpdfData('delete','{{ pdf.name|escapejs }}','{{ pdf.Class|escapejs }}')" class="bg-gray-700 hover:bg-gray-800 text-white py-1 px-3 rounded">Delete</button>
+              </td>
             </tr>
             {% empty %}
-            <td>No pdfs found</td>
-            <td>No Action</td>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h1>PDFs that are not visible now</h1>
-    <table border="1">
-        <thead>
             <tr>
-                <th>PDF Names</th>
-                <th>Class</th>
-                <th>Actions</th>
+              <td class="py-2 px-4" colspan="3">No PDFs found</td>
             </tr>
-        </thead>
-        <tbody>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
+    <section>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">PDFs That Are Not Visible</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg">
+          <thead class="bg-blue-800 text-white">
+            <tr>
+              <th class="py-2 px-4">PDF Names</th>
+              <th class="py-2 px-4">Class</th>
+              <th class="py-2 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-700">
             {% for fpdf in f_pdfs %}
-            <tr>
-                <td>{{ fpdf.name }}</td>
-                <td>{{ fpdf.Class }}</td>
-                <td>
-                    <button onclick="sendpdfData('True','{{ fpdf.name|escapejs }}','{{ fpdf.Class|escapejs }}')">Allow</button>
-                    <button onclick="sendpdfData('delete','{{ fpdf.name|escapejs }}','{{ fpdf.Class|escapejs }}')">Delete</button>
-                </td>
+            <tr class="border-b hover:bg-gray-100">
+              <td class="py-2 px-4">{{ fpdf.name }}</td>
+              <td class="py-2 px-4">{{ fpdf.Class }}</td>
+              <td class="py-2 px-4 space-x-2">
+                <button onclick="sendpdfData('True','{{ fpdf.name|escapejs }}','{{ fpdf.Class|escapejs }}')" class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded">Allow</button>
+                <button onclick="sendpdfData('delete','{{ fpdf.name|escapejs }}','{{ fpdf.Class|escapejs }}')" class="bg-gray-700 hover:bg-gray-800 text-white py-1 px-3 rounded">Delete</button>
+              </td>
             </tr>
             {% empty %}
-            <td>No pdfs found</td>
-            <td>No Action</td>
+            <tr>
+              <td class="py-2 px-4" colspan="3">No PDFs found</td>
+            </tr>
             {% endfor %}
-        </tbody>
-    </table>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
-    <!-- PDFS:-
+  <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+  <script>
+    function sendpdfData(allow, namee, classssss) {
+      const data = {
+        "open_ok": allow,
+        "name__": namee,
+        "class": classssss,
+      };
+      fetch(window.location.href, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": document.getElementById("csrf_token").value
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          return response.json();
+        }
+      })
+      .then(data => {
+        if (data && data.message) {
+          alert(data.message);
+        }
+      })
+      .catch(error => console.error("Error:", error));
+    }
+  </script>
 
-    {% for pdf in pdfs %}
-        <li>{{ pdf.name }}</li>
-    {% empty %}
-        <li>No pdfs found.</li>
-    {% endfor %} -->
-
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white text-center py-10 mt-16">
+    <div class="max-w-4xl mx-auto px-4">
+      <h3 class="text-2xl font-extrabold text-yellow-400">Crafted with Passion</h3>
+      <p class="mt-4 text-xl">This entire website — from concept to code — has been envisioned, designed, and developed by</p>
+      <p class="mt-2 text-3xl font-bold text-white">Sundarlala Pal</p>
+      <p class="text-base italic text-gray-300">(Frontend Ninja, Backend Beast, Full Stack Wizard & Future Iron Man 🦾)</p>
+      <div class="mt-6">
+        <p class="text-lg">Want a custom website, app, or digital solution for your business or idea?</p>
+        <p class="text-lg font-semibold mt-1">I build everything from scratch, tailored to your vision!</p>
+      </div>
+      <p class="mt-4 text-lg">Reach out to me directly:</p>
+      <p class="mt-2">
+        <a href="https://wa.me/919933882270" class="text-green-400 hover:underline">WhatsApp</a>
+      </p>
+      <p class="mt-6 text-sm text-gray-400">&copy; 2025 Illuminati Coaching Centre. All Rights Reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>
