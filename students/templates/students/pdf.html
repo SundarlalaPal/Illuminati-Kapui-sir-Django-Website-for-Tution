@@ -119,7 +119,6 @@
         canvas.classList.add("pdf-page");
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-
         const context = canvas.getContext('2d');
         const renderContext = {
           canvasContext: context,
@@ -135,22 +134,18 @@
       });
     }
 
-    // Preserves scroll position after zooming or rotating
+    // Preserves the scroll position based on the focal point
     function rerenderAllPreserveScroll(focusX = 0.5, focusY = 0.5) {
       const scrollX = viewerContainer.scrollLeft;
       const scrollY = viewerContainer.scrollTop;
       const rect = viewerContainer.getBoundingClientRect();
       const targetX = scrollX + rect.width * focusX;
       const targetY = scrollY + rect.height * focusY;
-
       setupLazyLoading();
-      
-      setTimeout(() => {
-        const newScrollX = targetX * (scale / prevScale) - rect.width * focusX;
-        const newScrollY = targetY * (scale / prevScale) - rect.height * focusY;
-        viewerContainer.scrollLeft = newScrollX;
-        viewerContainer.scrollTop = newScrollY;
-      }, 100);
+      const newScrollX = targetX * (scale / prevScale) - rect.width * focusX;
+      const newScrollY = targetY * (scale / prevScale) - rect.height * focusY;
+      viewerContainer.scrollLeft = newScrollX;
+      viewerContainer.scrollTop = newScrollY;
     }
 
     function zoomIn() {
@@ -186,15 +181,18 @@
     // Handle pinch-to-zoom gestures
     let startDistance = null;
     let startScale = 1;
+    let pinchScaleFactor = 1;
+    // originX and originY are stored as fractions (0-1) of pdfPagesWrapper dimensions.
     let originX = 0.5, originY = 0.5;
-    let pinchTimeout;
 
     viewerContainer.addEventListener("touchstart", (e) => {
       if (e.touches.length === 2) {
+        // Compute the initial distance between two fingers.
         const dx = e.touches[1].clientX - e.touches[0].clientX;
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         startDistance = Math.hypot(dx, dy);
         startScale = scale;
+        // Calculate the focal point of the gesture.
         const rect = viewerContainer.getBoundingClientRect();
         const midX = ((e.touches[0].clientX + e.touches[1].clientX) / 2) - rect.left + viewerContainer.scrollLeft;
         const midY = ((e.touches[0].clientY + e.touches[1].clientY) / 2) - rect.top + viewerContainer.scrollTop;
@@ -206,26 +204,31 @@
 
     viewerContainer.addEventListener("touchmove", (e) => {
       if (e.touches.length === 2 && startDistance !== null) {
-        // Only prevent default during pinch gestures
+        // Prevent the default pinch-to-zoom behavior.
         e.preventDefault();
         const dx = e.touches[1].clientX - e.touches[0].clientX;
         const dy = e.touches[1].clientY - e.touches[0].clientY;
         const currentDistance = Math.hypot(dx, dy);
-        const scaleFactor = currentDistance / startDistance;
-        // Temporarily scale the content for a smooth pinch effect
-        pdfPagesWrapper.style.transform = `scale(${startScale * scaleFactor})`;
-        clearTimeout(pinchTimeout);
-        pinchTimeout = setTimeout(() => {
-          prevScale = scale;
-          scale = Math.min(Math.max(startScale * scaleFactor, 0.5), 5);
-          pdfPagesWrapper.style.transform = 'none';
-          rerenderAllPreserveScroll(originX, originY);
-        }, 200);
+        // Capture the instantaneous pinch scale factor.
+        pinchScaleFactor = currentDistance / startDistance;
+        // Apply a temporary CSS transform for smooth visual feedback.
+        pdfPagesWrapper.style.transform = `scale(${startScale * pinchScaleFactor})`;
       }
     });
 
-    viewerContainer.addEventListener("touchend", () => {
-      startDistance = null;
+    viewerContainer.addEventListener("touchend", (e) => {
+      if (startDistance !== null) {
+        // When touch ends, remove the temporary transform.
+        pdfPagesWrapper.style.transform = 'none';
+        prevScale = scale;
+        // Update scale based on the final pinch factor.
+        scale = Math.min(Math.max(startScale * pinchScaleFactor, 0.5), 5);
+        // Re-render the PDF pages with the new scale while preserving the zoom focal point.
+        rerenderAllPreserveScroll(originX, originY);
+        // Reset the pinch values.
+        startDistance = null;
+        pinchScaleFactor = 1;
+      }
     });
   </script>
 </body>
