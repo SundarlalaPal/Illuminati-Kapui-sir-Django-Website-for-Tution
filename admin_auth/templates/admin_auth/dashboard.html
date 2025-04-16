@@ -2,83 +2,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Illuminati">
-<meta property="og:image" content="{% static 'images/favicon.png' %}">
-<meta property="og:description" content="Study">
-    <title>Admin Panel</title>
-    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        h1 {
-            color: #333;
-        }
-        .links {
-            margin-top: 20px;
-        }
-        .links a {
-            display: block;
-            background: #007BFF;
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-        .links a:hover {
-            background: #0056b3;
-        }
-        .logout {
-            margin-top: 20px;
-        }
-        .logout a {
-            display: inline-block;
-            background: #dc3545;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-        .logout a:hover {
-            background: #c82333;
-        }
-        @media (max-width: 600px) {
-            .container {
-                width: 90%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Admin Dashboard - Manage PDFs, Students, and Signups for Illuminati Coaching Centre.">
+  <meta property="og:title" content="Admin Dashboard - Illuminati">
+  <meta property="og:image" content="{% static 'images/favicon.png' %}">
+  <meta property="og:description" content="Illuminati Coaching Centre Admin Panel">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <title>Admin Panel | Illuminati Coaching Centre</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Welcome, {{ First_Name }} Admin</h1>
-        <div class="links">
-            <a href="/coming_soon">List All Students</a>
-            <a href="/coming_soon">Select Specific Class</a>
-            <a href="/admin-auth/list_pdfs">PDFS</a>
-            <a href="/admin-auth/upload">Upload PDFS</a>
-            <a href="/admin-auth/signup-users">Signup Users</a>
-        </div>
-        <div class="logout">
-            <a href="/auth/logout">Logout</a>
-        </div>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Navbar -->
+  <nav class="bg-blue-800 border-gray-200">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{% static 'images/logo2.png' %}" class="h-8" alt="Illuminati Logo" />
+        <span class="self-center text-2xl font-semibold text-white">Illuminati</span>
+      </a>
+      <div class="hidden md:flex md:space-x-8">
+        <a href="/" class="text-white hover:text-yellow-300">Home</a>
+        <a href="/dashboard" class="text-white hover:text-yellow-300">User Dashboard</a>
+        <a href="/auth/logout" class="text-white hover:text-yellow-300">Logout</a>
+      </div>
     </div>
+  </nav>
+
+  <!-- Admin Welcome Section -->
+  <section class="text-center py-12 bg-white shadow-md">
+    <h1 class="text-4xl font-bold text-blue-800">Welcome, {{ First_Name }} Admin</h1>
+    <p class="text-gray-600 mt-2">You have full control over the system. Proceed with caution 😏</p>
+  </section>
+
+  <!-- Admin Control Panel -->
+  <main class="max-w-xl mx-auto mt-10 px-6">
+    <div class="grid gap-4">
+      <a href="/coming_soon" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg py-3 px-6 rounded-lg shadow-md text-center">List All Students</a>
+      <a href="/coming_soon" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg py-3 px-6 rounded-lg shadow-md text-center">Select Specific Class</a>
+      <a href="/admin-auth/list_pdfs" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg py-3 px-6 rounded-lg shadow-md text-center">Manage PDFs</a>
+      <a href="/admin-auth/upload" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg py-3 px-6 rounded-lg shadow-md text-center">Upload PDFs</a>
+      <a href="/admin-auth/signup-users" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg py-3 px-6 rounded-lg shadow-md text-center">Signup Users</a>
+    </div>
+
+    <div class="mt-8 text-center">
+      <a href="/auth/logout" class="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-md py-2 px-5 rounded-full shadow-md transition">Logout</a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white text-center py-10 mt-20">
+    <div class="max-w-4xl mx-auto px-4">
+      <h3 class="text-2xl font-extrabold text-yellow-400">Crafted with Passion</h3>
+      <p class="mt-4 text-xl">This entire website — from concept to code — has been envisioned, designed, and developed by</p>
+      <p class="mt-2 text-3xl font-bold text-white">Sundarlala Pal</p>
+      <p class="text-base italic text-gray-300">(Frontend Ninja, Backend Beast, Full Stack Wizard & Future Iron Man 🦾)</p>
+      <div class="mt-6">
+        <p class="text-lg">Want a custom website, app, or digital solution for your business or idea?</p>
+        <p class="text-lg font-semibold mt-1">I build everything from scratch, tailored to your vision!</p>
+      </div>
+      <p class="mt-4 text-lg">Reach out to me directly:</p>
+      <p class="mt-2">
+        <a href="https://wa.me/919933882270" class="text-green-400 hover:underline">WhatsApp</a>
+      </p>
+      <p class="mt-6 text-sm text-gray-400">&copy; 2025 Illuminati Coaching Centre. All Rights Reserved.</p>
+    </div>
+  </footer>
+
 </body>
 </html>
