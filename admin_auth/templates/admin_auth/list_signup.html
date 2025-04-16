@@ -2,98 +2,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Illuminati">
-<meta property="og:image" content="{% static 'images/favicon.png' %}">
-<meta property="og:description" content="Study">
-    <title>Signup Users List</title>
-    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
-    <script>
-        function sendUserData(user_id, first_name, last_name, email, password, phone_number, age, user_class, guardian_name,board, allow) {
-            const data = {
-                "user_id": user_id,
-                "First_Name": first_name,
-                "Last_Name": last_name,
-                "email": email,
-                "Password": password,
-                "Phone_Number": phone_number,
-                "Age": age,
-                "Class": user_class,
-                "Guardian_Name": guardian_name,
-                "Board": board,
-                "Allow": allow
-            };
-
-            fetch(window.location.href, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": document.getElementById("csrf_token").value
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;  // This will follow the redirect
-                    } else {
-                        // Optional fallback: handle other cases
-                        return response.json();
-                    }
-                })
-                .then(data => {
-                    if (data && data.message) {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => console.error("Error:", error));
-        }
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Manage signup users for Illuminati Coaching Centre. Approve or deny new student requests easily.">
+  <meta property="og:title" content="Signup User Management - Illuminati">
+  <meta property="og:image" content="{% static 'images/favicon.png' %}">
+  <meta property="og:description" content="Admin panel to manage student signups at Illuminati Coaching Centre.">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <title>Signup Users List | Illuminati Coaching Centre</title>
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h2>Signup Users List</h2>
+<body class="bg-gray-100 text-gray-800">
 
-    <!-- CSRF Token -->
-    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+  <!-- Navbar -->
+  <nav class="bg-blue-800 border-gray-200">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="{% static 'images/logo2.png' %}" class="h-8" alt="Illuminati Logo" />
+        <span class="self-center text-2xl font-semibold text-white">Illuminati</span>
+      </a>
+      <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-white rounded-lg md:hidden hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 17 14" xmlns="http://www.w3.org/2000/svg">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+        </svg>
+      </button>
+      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+        <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-blue-700 rounded-lg bg-blue-700 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-blue-800">
+          <li><a href="/dashboard" class="block py-2 px-3 text-white md:hover:text-yellow-300">Dashboard</a></li>
+          <li><a href="/" class="block py-2 px-3 text-white md:hover:text-yellow-300">Home</a></li>
+          <li><a href="/auth/logout" class="block py-2 px-3 text-white md:hover:text-yellow-300">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>User ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Phone Number</th>
-                <th>Age</th>
-                <th>Class</th>
-                <th>Guardian Name</th>
-                <th>Board</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.user_id }}</td>
-                <td>{{ user.First_Name }}</td>
-                <td>{{ user.Last_Name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.Password }}</td>
-                <td>{{ user.Phone_Number }}</td>
-                <td>{{ user.Age }}</td>
-                <td>{{ user.Class }}</td>
-                <td>{{ user.Guardian_Name }}</td>
-                <td>{{ user.Board }}</td>
-                <td>
-                    <button onclick="sendUserData('{{ user.user_id|escapejs }}', '{{ user.First_Name|escapejs }}', '{{ user.Last_Name|escapejs }}', '{{ user.email|escapejs }}', '{{ user.Password|escapejs }}', '{{ user.Phone_Number|escapejs }}', '{{ user.Age|escapejs }}', '{{ user.Class|escapejs }}', '{{ user.Guardian_Name|escapejs }}','{{ user.Board|escapejs }}', 'True')">Allow</button>
+  <!-- Page Title -->
+  <div class="text-center py-10">
+    <h1 class="text-3xl font-bold text-blue-800">Signup Users List</h1>
+    <p class="text-gray-600 mt-2">Approve or deny new students who registered on the website.</p>
+  </div>
 
-                    <button onclick="sendUserData('{{ user.user_id|escapejs }}', '{{ user.First_Name|escapejs }}', '{{ user.Last_Name|escapejs }}', '{{ user.email|escapejs }}', '{{ user.Password|escapejs }}', '{{ user.Phone_Number|escapejs }}', '{{ user.Age|escapejs }}', '{{ user.Class|escapejs }}', '{{ user.Guardian_Name|escapejs }}','{{ user.Board|escapejs }}', 'False')">Deny</button>
+  <!-- CSRF Token -->
+  <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
 
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
+  <!-- Table -->
+  <div class="overflow-x-auto max-w-7xl mx-auto mb-20 px-4">
+    <table class="w-full text-sm text-left text-gray-700 bg-white shadow-md rounded-xl overflow-hidden">
+      <thead class="text-xs text-white uppercase bg-blue-800">
+        <tr>
+          <th scope="col" class="px-4 py-3">User ID</th>
+          <th scope="col" class="px-4 py-3">First Name</th>
+          <th scope="col" class="px-4 py-3">Last Name</th>
+          <th scope="col" class="px-4 py-3">Email</th>
+          <th scope="col" class="px-4 py-3">Phone</th>
+          <th scope="col" class="px-4 py-3">Age</th>
+          <th scope="col" class="px-4 py-3">Class</th>
+          <th scope="col" class="px-4 py-3">Guardian</th>
+          <th scope="col" class="px-4 py-3">Board</th>
+          <th scope="col" class="px-4 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr class="bg-white border-b hover:bg-gray-50">
+          <td class="px-4 py-3">{{ user.user_id }}</td>
+          <td class="px-4 py-3">{{ user.First_Name }}</td>
+          <td class="px-4 py-3">{{ user.Last_Name }}</td>
+          <td class="px-4 py-3">{{ user.email }}</td>
+          <td class="px-4 py-3">{{ user.Phone_Number }}</td>
+          <td class="px-4 py-3">{{ user.Age }}</td>
+          <td class="px-4 py-3">{{ user.Class }}</td>
+          <td class="px-4 py-3">{{ user.Guardian_Name }}</td>
+          <td class="px-4 py-3">{{ user.Board }}</td>
+          <td class="px-4 py-3 space-x-2">
+            <button onclick="sendUserData('{{ user.user_id|escapejs }}', '{{ user.First_Name|escapejs }}', '{{ user.Last_Name|escapejs }}', '{{ user.email|escapejs }}', '{{ user.Password|escapejs }}', '{{ user.Phone_Number|escapejs }}', '{{ user.Age|escapejs }}', '{{ user.Class|escapejs }}', '{{ user.Guardian_Name|escapejs }}', '{{ user.Board|escapejs }}', 'True')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs">Allow</button>
+            <button onclick="sendUserData('{{ user.user_id|escapejs }}', '{{ user.First_Name|escapejs }}', '{{ user.Last_Name|escapejs }}', '{{ user.email|escapejs }}', '{{ user.Password|escapejs }}', '{{ user.Phone_Number|escapejs }}', '{{ user.Age|escapejs }}', '{{ user.Class|escapejs }}', '{{ user.Guardian_Name|escapejs }}', '{{ user.Board|escapejs }}', 'False')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-xs">Deny</button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="10" class="text-center text-gray-500 py-4">No users found.</td></tr>
+        {% endfor %}
+      </tbody>
     </table>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white text-center py-10">
+    <div class="max-w-4xl mx-auto px-4">
+      <h3 class="text-2xl font-extrabold text-yellow-400">Crafted with Passion</h3>
+      <p class="mt-4 text-xl">This entire website — from concept to code — has been envisioned, designed, and developed by</p>
+      <p class="mt-2 text-3xl font-bold text-white">Sundarlala Pal</p>
+      <p class="text-base italic text-gray-300">(Frontend Ninja, Backend Beast, Full Stack Wizard & Future Iron Man 🦾)</p>
+      <div class="mt-6">
+        <p class="text-lg">Want a custom website, app, or digital solution for your business or idea?</p>
+        <p class="text-lg font-semibold mt-1">I build everything from scratch, tailored to your vision!</p>
+      </div>
+      <p class="mt-4 text-lg">Reach out to me directly:</p>
+      <p class="mt-2">
+        <a href="https://wa.me/919933882270" class="text-green-400 hover:underline">WhatsApp</a>
+      </p>
+      <p class="mt-6 text-sm text-gray-400">&copy; 2025 Illuminati Coaching Centre. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    function sendUserData(user_id, first_name, last_name, email, password, phone_number, age, user_class, guardian_name, board, allow) {
+      const data = {
+        "user_id": user_id,
+        "First_Name": first_name,
+        "Last_Name": last_name,
+        "email": email,
+        "Password": password,
+        "Phone_Number": phone_number,
+        "Age": age,
+        "Class": user_class,
+        "Guardian_Name": guardian_name,
+        "Board": board,
+        "Allow": allow
+      };
+
+      fetch(window.location.href, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": document.getElementById("csrf_token").value
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;
+        } else {
+          return response.json();
+        }
+      })
+      .then(data => {
+        if (data && data.message) {
+          alert(data.message);
+        }
+      })
+      .catch(error => console.error("Error:", error));
+    }
+  </script>
 </body>
 </html>
